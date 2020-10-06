@@ -97,7 +97,7 @@ if __name__ == '__main__':
         end = datetime.datetime.now()
         
         print('Determining session type.')
-        session_type = get_session_type(60)
+        session_type = get_session_type(59)
         
         print('Calculating poop session length.')
         times = calculate_times(start, end)
