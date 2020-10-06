@@ -16,23 +16,29 @@ import csv
 import datetime
 from gpiozero import Button
 from math import floor
-import requests
 from time import sleep
 
+import requests
 import twitter
 
 import secrets
 
 
 api = twitter.Api(consumer_key=secrets.consumer_key,
-                    consumer_secret=secrets.consumer_secret,
-                    access_token_key=secrets.access_token_key,
-                    access_token_secret=secrets.access_token_secret)
+                  consumer_secret=secrets.consumer_secret,
+                  access_token_key=secrets.access_token_key,
+                  access_token_secret=secrets.access_token_secret)
                     
-def generate_session_message(times):
+def generate_session_message(times, session_type):
+    # TODO: Calculate noop if empty.
     minutes = times[2]
     seconds = times[3]
-    return f'I pooped for {minutes} minutes and {seconds} seconds.'
+    # TODO: Calculate hours
+    
+    if session_type == 'shit':
+        return f'I pooped for {minutes} minutes and {seconds} seconds.'
+    else:
+        return f'I peed for {minutes} minutes and {seconds} seconds.'
     
 def calculate_times(start, end):
     time_delta = end - start
@@ -61,6 +67,15 @@ def connected_to_internet():
         response = session.get('http://www.google.com')
         if response.status_code == 200:
             return True
+            
+def get_session_type(tof_data):
+    '''Determine type of bathroom session.'''
+    poop_threshold = 60
+
+    if tof_data < poop_threshold:
+        return 'piss'
+    else:
+        return 'shit'
 
 if __name__ == '__main__':
     ass_switch = Button(26)
@@ -83,11 +98,14 @@ if __name__ == '__main__':
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
         
+        print('Determining session type.')
+        session_type = session_type(60)
+        
         print('Calculating poop session length.')
         times = calculate_times(start, end)
         
         print('Generating tweets with stats.')
-        message = generate_session_message(times)
+        message = generate_session_message(times, session_type)
         
         print('Sending tweet.')
         tweet(message)
