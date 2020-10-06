@@ -30,10 +30,8 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
                   access_token_secret=secrets.access_token_secret)
                     
 def generate_session_message(times, session_type):
-    # TODO: Calculate noop if empty.
     minutes = times[2]
-    seconds = times[3]
-    # TODO: Calculate hours
+    seconds = times[3]gen
     
     if session_type == 'shit':
         return f'I pooped for {minutes} minutes and {seconds} seconds.'
