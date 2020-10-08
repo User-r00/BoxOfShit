@@ -100,6 +100,7 @@ if __name__ == '__main__':
             sleep(1)
             
         wifi_led = GREEN
+        wifi_led.show()
         
         print('Waiting for ass.')
         ass_switch.wait_for_press()
