@@ -19,16 +19,25 @@ from math import floor
 import requests
 from time import sleep
 
+import neopixel
 import twitter
 
 import secrets
 
 
 api = twitter.Api(consumer_key=secrets.consumer_key,
-                    consumer_secret=secrets.consumer_secret,
-                    access_token_key=secrets.access_token_key,
-                    access_token_secret=secrets.access_token_secret)
+                  consumer_secret=secrets.consumer_secret,
+                  access_token_key=secrets.access_token_key,
+                  access_token_secret=secrets.access_token_secret)
                     
+pixels = neopixel.NeoPixel(board.D12, 2, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
+wifi_led = neopixel[1]
+power_led = neopixel[0]
+
+AMBER = 0xFFFF00
+GREEN = 0x00FF00
+BLUE = 0x00FFFF
+
 def generate_session_message(times):
     minutes = times[2]
     seconds = times[3]
@@ -45,7 +54,9 @@ def calculate_times(start, end):
     return (start_str, end_str, minutes, seconds, start, end)
 
 def tweet(message):
+    wifi_led.fill(BLUE)
     status = api.PostUpdate(message)
+    wifi_led.fill(GREEN)
     print(status.text)
     
 def save_data(times):
@@ -60,7 +71,11 @@ def connected_to_internet():
     with requests.Session() as session:
         response = session.get('http://www.google.com')
         if response.status_code == 200:
+            wifi_led.fill(GREEN)
             return True
+        else:
+            wifi_led.fill(AMBER)
+            return False
 
 if __name__ == '__main__':
     ass_switch = Button(26)
@@ -73,12 +88,14 @@ if __name__ == '__main__':
         
         print('Waiting for ass.')
         ass_switch.wait_for_press()
+        wifi_led.fill(AMBER)
         
         print('Ass found. Starting timer.')
         start = datetime.datetime.now()
         
         print('Waiting for ass to disappear.')
         ass_switch.wait_for_release()
+        wifi_led.fill(GREEN)
         
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
