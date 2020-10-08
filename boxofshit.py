@@ -32,7 +32,6 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
                   access_token_secret=secrets.access_token_secret)
                     
 pixels = neopixel.NeoPixel(board.D12, 1, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
-wifi_led = pixels[0]
 
 RED = 0xFF0000
 AMBER = 0xFFFF00
@@ -59,9 +58,9 @@ def calculate_times(start, end):
     return (start_str, end_str, minutes, seconds, start, end)
 
 def tweet(message):
-    wifi_led = BLUE
+    pixels[0] = BLUE
     status = api.PostUpdate(message)
-    wifi_led = GREEN
+    pixels[0] = GREEN
     print(status.text)
     
 def save_data(times):
@@ -99,19 +98,19 @@ if __name__ == '__main__':
             # Set Wi-Fi LED to orange.
             sleep(1)
             
-        wifi_led = GREEN
+        pixels[0] = GREEN
         pixels.show()
         
         print('Waiting for ass.')
         ass_switch.wait_for_press()
-        wifi_led = AMBER
+        pixels[0] = AMBER
         
         print('Ass found. Starting timer.')
         start = datetime.datetime.now()
         
         print('Waiting for ass to disappear.')
         ass_switch.wait_for_release()
-        wifi_led = GREEN
+        pixels[0] = GREEN
         
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
