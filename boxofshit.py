@@ -58,9 +58,9 @@ def calculate_times(start, end):
     return (start_str, end_str, minutes, seconds, start, end)
 
 def tweet(message):
-    wifi_led.fill(BLUE)
+    wifi_led = BLUE
     status = api.PostUpdate(message)
-    wifi_led.fill(GREEN)
+    wifi_led = GREEN
     print(status.text)
     
 def save_data(times):
@@ -75,10 +75,10 @@ def connected_to_internet():
     with requests.Session() as session:
         response = session.get('http://www.google.com')
         if response.status_code == 200:
-            wifi_led.fill(GREEN)
+            wifi_led = GREEN
             return True
         else:
-            wifi_led.fill(AMBER)
+            wifi_led = AMBER
             return False
             
 def get_session_type(tof_data):
@@ -101,14 +101,14 @@ if __name__ == '__main__':
         
         print('Waiting for ass.')
         ass_switch.wait_for_press()
-        wifi_led.fill(AMBER)
+        wifi_led = AMBER
         
         print('Ass found. Starting timer.')
         start = datetime.datetime.now()
         
         print('Waiting for ass to disappear.')
         ass_switch.wait_for_release()
-        wifi_led.fill(GREEN)
+        wifi_led = GREEN
         
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
