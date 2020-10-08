@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 '''
@@ -16,10 +16,10 @@ import csv
 import datetime
 from gpiozero import Button
 from math import floor
-import requests
 from time import sleep
 
 import neopixel
+import requests
 import twitter
 
 import secrets
@@ -38,10 +38,14 @@ AMBER = 0xFFFF00
 GREEN = 0x00FF00
 BLUE = 0x00FFFF
 
-def generate_session_message(times):
+def generate_session_message(times, session_type):
     minutes = times[2]
     seconds = times[3]
-    return f'I pooped for {minutes} minutes and {seconds} seconds.'
+    
+    if session_type == 'shit':
+        return f'I pooped for {minutes} minutes and {seconds} seconds.'
+    else:
+        return f'I peed for {minutes} minutes and {seconds} seconds.'
     
 def calculate_times(start, end):
     time_delta = end - start
@@ -76,6 +80,15 @@ def connected_to_internet():
         else:
             wifi_led.fill(AMBER)
             return False
+            
+def get_session_type(tof_data):
+    '''Determine type of bathroom session.'''
+    poop_threshold = 60
+
+    if tof_data < poop_threshold:
+        return 'piss'
+    else:
+        return 'shit'
 
 if __name__ == '__main__':
     ass_switch = Button(26)
@@ -100,11 +113,14 @@ if __name__ == '__main__':
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
         
+        print('Determining session type.')
+        session_type = get_session_type(59)
+        
         print('Calculating poop session length.')
         times = calculate_times(start, end)
         
         print('Generating tweets with stats.')
-        message = generate_session_message(times)
+        message = generate_session_message(times, session_type)
         
         print('Sending tweet.')
         tweet(message)
