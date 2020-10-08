@@ -18,6 +18,7 @@ from gpiozero import Button
 from math import floor
 from time import sleep
 
+import board
 import neopixel
 import requests
 import twitter
