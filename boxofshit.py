@@ -44,8 +44,8 @@ def generate_session_message(times, session_type):
     
     if session_type == 'shit':
         return f'I pooped for {minutes} minutes and {seconds} seconds.'
-    else:
-        return f'I peed for {minutes} minutes and {seconds} seconds.'
+    
+    return f'I peed for {minutes} minutes and {seconds} seconds.'
     
 def calculate_times(start, end):
     time_delta = end - start
