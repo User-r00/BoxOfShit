@@ -34,6 +34,7 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
 pixels = neopixel.NeoPixel(board.D12, 2, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
 wifi_led = pixels[0]
 
+RED = 0xFF0000
 AMBER = 0xFFFF00
 GREEN = 0x00FF00
 BLUE = 0x00FFFF
@@ -75,10 +76,8 @@ def connected_to_internet():
     with requests.Session() as session:
         response = session.get('http://www.google.com')
         if response.status_code == 200:
-            wifi_led = GREEN
             return True
         else:
-            wifi_led = AMBER
             return False
             
 def get_session_type(tof_data):
@@ -94,10 +93,13 @@ if __name__ == '__main__':
     ass_switch = Button(26)
 
     while True:
+        
         while not connected_to_internet():
             print('WiFi signal lost.')
             # Set Wi-Fi LED to orange.
             sleep(1)
+            
+        wifi_led = GREEN
         
         print('Waiting for ass.')
         ass_switch.wait_for_press()
