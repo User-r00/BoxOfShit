@@ -31,7 +31,7 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
                   access_token_key=secrets.access_token_key,
                   access_token_secret=secrets.access_token_secret)
                     
-pixels = neopixel.NeoPixel(board.D12, 2, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
+pixels = neopixel.NeoPixel(board.D12, 1, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
 wifi_led = pixels[0]
 
 RED = 0xFF0000
