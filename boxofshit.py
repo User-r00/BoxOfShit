@@ -136,7 +136,7 @@ if __name__ == '__main__':
         message = generate_session_message(times)
         
         print('Sending tweet.')
-        # tweet(message)
+        tweet(message)
         
         print('Saving data to file.')
         save_data(times)
