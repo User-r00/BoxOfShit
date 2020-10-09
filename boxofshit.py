@@ -48,7 +48,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 
 # Time of flight sensor. Used for measuring standing vs sitting posture.
 piss_shit_sensor = adafruit_vl53l0x.VL53L0X(i2c)
-sensor.measurement_timing_budget = 200000
+piss_shit_sensor.measurement_timing_budget = 200000
 
 def generate_session_message(times, session_type):
     minutes = times[2]
