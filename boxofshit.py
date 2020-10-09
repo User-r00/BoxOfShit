@@ -114,7 +114,7 @@ if __name__ == '__main__':
         pixels.show()
         
         range = piss_shit_sensor.range
-        print(f'Range: {range})
+        print(f'Range: {range}')
         
         # print('Waiting for ass.')
         # ass_switch.wait_for_press()
