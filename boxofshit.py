@@ -109,7 +109,7 @@ if __name__ == '__main__':
             print('WiFi signal lost.')
             # Set Wi-Fi LED to orange.
             sleep(1)
-            
+            sudo pip3 install adafruit-circuitpython-vl53l0x
         pixels[0] = GREEN
         pixels.show()
         
@@ -145,4 +145,4 @@ if __name__ == '__main__':
         # print('Saving data to file.')
         # save_data(times)
     
-    sleep(1)
+    # sleep(1)
