@@ -97,11 +97,11 @@ def get_session_type():
     poop_threshold = 200
     
     distance_to_cheeks = piss_shit_sensor.range
-
+    print(f'Distance to cheeks at time of session end: {distance_to_cheeks}mm.')
     if distance_to_cheeks > poop_threshold:
-        return 'shit'
-    else:
         return 'piss'
+    else:
+        return 'shit'
 
 if __name__ == '__main__':
     ass_switch = Button(26)
