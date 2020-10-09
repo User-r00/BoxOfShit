@@ -18,7 +18,9 @@ from gpiozero import Button
 from math import floor
 from time import sleep
 
+import adafruit_vl53l0x
 import board
+import busio
 import neopixel
 import requests
 import twitter
@@ -26,17 +28,27 @@ import twitter
 import secrets
 
 
+# Twitter api object.
 api = twitter.Api(consumer_key=secrets.consumer_key,
                   consumer_secret=secrets.consumer_secret,
                   access_token_key=secrets.access_token_key,
                   access_token_secret=secrets.access_token_secret)
-                    
+      
+# Setup status LEDs.              
 pixels = neopixel.NeoPixel(board.D12, 1, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
 
+# Status LED colors.
 RED = 0xFF0000
 AMBER = 0xFFFF00
 GREEN = 0x00FF00
 BLUE = 0x00FFFF
+
+# Setup I2C
+i2c = busio.I2C(board.SCL, board.SDA)
+
+
+piss_shit_sensor = adafruit_vl53l0x.VL53L0X(i2c)
+
 
 def generate_session_message(times, session_type):
     minutes = times[2]
@@ -101,33 +113,36 @@ if __name__ == '__main__':
         pixels[0] = GREEN
         pixels.show()
         
-        print('Waiting for ass.')
-        ass_switch.wait_for_press()
-        pixels[0] = AMBER
+        range = piss_shit_sensor.range
+        print(f'Range: {range})
         
-        print('Ass found. Starting timer.')
-        start = datetime.datetime.now()
-        
-        print('Waiting for ass to disappear.')
-        ass_switch.wait_for_release()
-        pixels[0] = GREEN
-        
-        print('Poof! Ass is gone. Ending timer.')
-        end = datetime.datetime.now()
-        
-        print('Determining session type.')
-        session_type = get_session_type(59)
-        
-        print('Calculating poop session length.')
-        times = calculate_times(start, end)
-        
-        print('Generating tweets with stats.')
-        message = generate_session_message(times, session_type)
-        
-        print('Sending tweet.')
-        tweet(message)
-        
-        print('Saving data to file.')
-        save_data(times)
+        # print('Waiting for ass.')
+        # ass_switch.wait_for_press()
+        # pixels[0] = AMBER
+        # 
+        # print('Ass found. Starting timer.')
+        # start = datetime.datetime.now()
+        # 
+        # print('Waiting for ass to disappear.')
+        # ass_switch.wait_for_release()
+        # pixels[0] = GREEN
+        # 
+        # print('Poof! Ass is gone. Ending timer.')
+        # end = datetime.datetime.now()
+        # 
+        # print('Determining session type.')
+        # session_type = get_session_type(59)
+        # 
+        # print('Calculating poop session length.')
+        # times = calculate_times(start, end)
+        # 
+        # print('Generating tweets with stats.')
+        # message = generate_session_message(times, session_type)
+        # 
+        # print('Sending tweet.')
+        # # tweet(message)
+        # 
+        # print('Saving data to file.')
+        # save_data(times)
     
     sleep(1)
