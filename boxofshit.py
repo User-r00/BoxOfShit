@@ -46,9 +46,9 @@ BLUE = 0x00FFFF
 # Setup I2C
 i2c = busio.I2C(board.SCL, board.SDA)
 
-
+# Time of flight sensor. Used for measuring standing vs sitting posture.
 piss_shit_sensor = adafruit_vl53l0x.VL53L0X(i2c)
-
+sensor.measurement_timing_budget = 200000
 
 def generate_session_message(times, session_type):
     minutes = times[2]
@@ -105,15 +105,15 @@ if __name__ == '__main__':
 
     while True:
         
-        while not connected_to_internet():
-            print('WiFi signal lost.')
-            # Set Wi-Fi LED to orange.
-            sleep(1)
-        pixels[0] = GREEN
-        pixels.show()
+        # while not connected_to_internet():
+        #     print('WiFi signal lost.')
+        #     # Set Wi-Fi LED to orange.
+        #     sleep(1)
+        # pixels[0] = GREEN
+        # pixels.show()
         
         range = piss_shit_sensor.range
-        print(f'Range: {range}')
+        print(f'Range: {range}mm')
         
         # print('Waiting for ass.')
         # ass_switch.wait_for_press()
@@ -144,4 +144,4 @@ if __name__ == '__main__':
         # print('Saving data to file.')
         # save_data(times)
     
-    # sleep(1)
+    sleep(0.1)
