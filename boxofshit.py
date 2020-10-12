@@ -65,7 +65,7 @@ pixels = neopixel.NeoPixel(board.D12,
                            2,
                            auto_write=True,
                            brightness=0.2,
-                           pixel_order=neopixel.GRB)
+                           pixel_order=neopixel.RGB)
 
 # Status LED colors.
 RED = (255, 0, 0)
