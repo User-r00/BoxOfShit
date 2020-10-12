@@ -10,16 +10,41 @@ wiring diagram can be found in the README or at r00tuser.com.
 Created by: r00
 Version: 0.01a
 Last modified: 10/2/2020
+
+
+             -----
+            | 1|2 |
+    ToF SDA | 3|4 | Neopixel 5V1l
+    ToF SCL | 5|6 | Neopixel Ground
+            | 7|8 |
+            | 9|10|
+            |11|12|
+            |13|14|
+            |15|16|
+            |17|18|
+            |19|20|
+            |21|22|
+            |23|24|
+            |25|26| Trigger Button
+            |27|28|
+            |29|30|
+            |31|32| Neopixels
+            |33|34|
+            |35|36|
+            |37|38|
+            |39|40|
+             -----
 '''
 
 import csv
 import datetime
-from gpiozero import Button
+from random import randint
 from time import sleep
 
 import adafruit_vl53l0x
 import board
 import busio
+from gpiozero import Button
 import neopixel
 import requests
 import twitter
@@ -41,6 +66,7 @@ RED = 0xFF0000
 AMBER = 0xFFFF00
 GREEN = 0x00FF00
 BLUE = 0x00FFFF
+CLEAR = 0x000000
 
 # Setup I2C
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -60,6 +86,28 @@ def generate_session_message(times):
     
     return f'I peed for {minutes} minutes and {seconds} seconds.'
     
+def flicker(led: int, duration: int, color: set):
+    '''Randomly flicker an LED for a given amount of time.'''
+    random_floor = 1
+    random_ceiling = 25
+    
+    for i in range(duration):
+        print(i)
+        # light up for that time
+        pixels[led] = color
+        
+        # get random number
+        random_number = float(randint(random_floor, random_ceiling) / 100)
+    
+        sleep(random_number)
+        
+        # Turn off
+        pixels[led] = CLEAR
+        
+        # get random number
+        random_number = float(randint(random_floor, random_ceiling) / 100)
+        sleep(random_number)
+        
 def calculate_times(start, end):
     time_delta = end - start
     minutes = (time_delta.seconds // 60) % 60
@@ -72,9 +120,14 @@ def calculate_times(start, end):
 
 def tweet(message):
     pixels[0] = BLUE
-    status = api.PostUpdate(message)
+    # status = api.PostUpdate(message)
+    sleep(2)
     pixels[0] = GREEN
-    print(status.text)
+    # print(status.text)
+    
+    # TODO: Check return status for success. Alert on fail.
+    
+    flicker(1, 10, (BLUE))
     
 def save_data(times):
     start_time = times[4].strftime('%m/%d/%Y %H:%M:%S')
@@ -82,6 +135,8 @@ def save_data(times):
     with open('stats.csv', 'a') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         spamwriter.writerow([start_time, end_time, times[2], times[3], times[4]])
+    
+    flicker(0, 10, AMBER)
         
 def connected_to_internet():
     '''Checks if the system is connected to the internet.'''
