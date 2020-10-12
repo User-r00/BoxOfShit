@@ -65,7 +65,7 @@ pixels = neopixel.NeoPixel(board.D12,
                            2,
                            auto_write=True,
                            brightness=0.2,
-                           pixel_order=neopixel.RGB)
+                           pixel_order=neopixel.RBG)
 
 # Status LED colors.
 RED = (255, 0, 0)
@@ -144,8 +144,6 @@ def tweet(message):
                 sleep(3)
             else:
                 successful_tweet = True
-        else:
-            pixels[1] = GREEN
         
     flicker(1, 10, (BLUE))
 
@@ -160,7 +158,7 @@ def save_data(times):
                                 quoting=csv.QUOTE_MINIMAL)
         csvwriter.writerow([start_time, end_time, times[2], times[3], times[4]])
     
-    flicker(0, 10, AMBER)
+    flicker(1, 10, AMBER)
         
 def connected_to_internet():
     '''Checks if the system is connected to the internet.'''
