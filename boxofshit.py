@@ -71,7 +71,7 @@ pixels = neopixel.NeoPixel(board.D12,
 RED = (255, 0, 0)
 AMBER = (255, 255, 0)
 ORANGE = (255, 90, 0)
-GREEN = (0, 0, 255)
+GREEN = (0, 255, 0)
 BLUE = (0, 255, 255)
 CLEAR = (0, 0, 0)
 
@@ -117,6 +117,14 @@ def flicker(led: int, duration: int, color: set):
         # get random number
         random_number = float(randint(random_floor, random_ceiling) / 100)
         sleep(random_number)
+
+
+def blink(led, color):
+    '''Blink an led a given color one time.'''
+    pixels[led] = color
+    sleep(1)
+    pixels[led] = CLEAR
+    sleep(1)
 
 
 def calculate_times(start, end):
@@ -192,9 +200,7 @@ if __name__ == '__main__':
         while not connected_to_internet():
             print('WiFi signal lost.')
             blink(1, ORANGE)
-            sleep(1)
         pixels[0] = GREEN
-        pixels.show()
 
         print('Waiting for ass.')
         ass_switch.wait_for_press()
