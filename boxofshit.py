@@ -59,7 +59,7 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
                   access_token_secret=secrets.access_token_secret)
       
 # Setup status LEDs.              
-pixels = neopixel.NeoPixel(board.D12, 1, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
+pixels = neopixel.NeoPixel(board.D12, 2, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
 
 # Status LED colors.
 RED = 0xFF0000
