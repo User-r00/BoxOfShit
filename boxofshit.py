@@ -200,18 +200,18 @@ if __name__ == '__main__':
         while not connected_to_internet():
             print('WiFi signal lost.')
             blink(1, ORANGE)
-        pixels[0] = GREEN
+        pixels[1] = GREEN
 
         print('Waiting for ass.')
         ass_switch.wait_for_press()
-        pixels[0] = AMBER
+        pixels[1] = AMBER
 
         print('Ass found. Starting timer.')
         start = datetime.datetime.now()
 
         print('Waiting for ass to disappear.')
         ass_switch.wait_for_release()
-        pixels[0] = GREEN
+        pixels[1] = GREEN
 
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
