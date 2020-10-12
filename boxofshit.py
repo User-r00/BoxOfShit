@@ -14,7 +14,7 @@ Last modified: 10/2/2020
 
              -----
             | 1|2 |
-    ToF SDA | 3|4 | Neopixel 5V1l
+    ToF SDA | 3|4 | Neopixel 5V
     ToF SCL | 5|6 | Neopixel Ground
             | 7|8 |
             | 9|10|
@@ -57,84 +57,108 @@ api = twitter.Api(consumer_key=secrets.consumer_key,
                   consumer_secret=secrets.consumer_secret,
                   access_token_key=secrets.access_token_key,
                   access_token_secret=secrets.access_token_secret)
-      
-# Setup status LEDs.              
-pixels = neopixel.NeoPixel(board.D12, 2, auto_write=True, brightness=0.2, pixel_order=neopixel.RGB)
+
+# Setup status LEDs.
+# Power  = 0
+# Status = 1
+pixels = neopixel.NeoPixel(board.D12,
+                           2,
+                           auto_write=True,
+                           brightness=0.2,
+                           pixel_order=neopixel.RGB)
 
 # Status LED colors.
-RED = 0xFF0000
-AMBER = 0xFFFF00
-GREEN = 0x00FF00
-BLUE = 0x00FFFF
-CLEAR = 0x000000
+RED = (255, 0, 0)
+AMBER = (255, 255, 0)
+ORANGE = (255, 90, 0)
+GREEN = (0, 0, 255)
+BLUE = (0, 255, 255)
+CLEAR = (0, 0, 0)
 
 # Setup I2C
 i2c = busio.I2C(board.SCL, board.SDA)
+
 
 # Time of flight sensor. Used for measuring standing vs sitting posture.
 piss_shit_sensor = adafruit_vl53l0x.VL53L0X(i2c)
 piss_shit_sensor.measurement_timing_budget = 200000
 
+
 def generate_session_message(times):
     minutes = times[2]
     seconds = times[3]
-    
+
     session_type = get_session_type()
-    
+
     if session_type == 'shit':
         return f'I pooped for {minutes} minutes and {seconds} seconds.'
-    
+
     return f'I peed for {minutes} minutes and {seconds} seconds.'
-    
+
+
 def flicker(led: int, duration: int, color: set):
     '''Randomly flicker an LED for a given amount of time.'''
     random_floor = 1
     random_ceiling = 25
-    
+
     for i in range(duration):
         print(i)
         # light up for that time
         pixels[led] = color
-        
+
         # get random number
         random_number = float(randint(random_floor, random_ceiling) / 100)
-    
+
         sleep(random_number)
-        
+
         # Turn off
         pixels[led] = CLEAR
-        
+
         # get random number
         random_number = float(randint(random_floor, random_ceiling) / 100)
         sleep(random_number)
-        
+
+
 def calculate_times(start, end):
     time_delta = end - start
     minutes = (time_delta.seconds // 60) % 60
     seconds = time_delta.seconds - (minutes * 60)
-    
+
     start_str = start.strftime('%m/%d/%Y %H:%M:%S')
     end_str = end.strftime('%m/%d/%Y %H:%M:%S')
-    
+
     return (start_str, end_str, minutes, seconds, start, end)
 
+
 def tweet(message):
-    pixels[0] = BLUE
-    # status = api.PostUpdate(message)
-    sleep(2)
-    pixels[0] = GREEN
-    # print(status.text)
+    # Number of times to retry sending a tweet before giving up.
+    retries = 3
+    successful_tweet = False
     
-    # TODO: Check return status for success. Alert on fail.
-    
+    for retry in range(retries - 1):
+        if not successful_tweet:
+            pixels[1] = BLUE
+            status = api.PostUpdate(message)
+            
+            if message not in status.text:
+                sleep(3)
+            else:
+                successful_tweet = True
+        else:
+            pixels[1] = GREEN
+        
     flicker(1, 10, (BLUE))
-    
+
+
 def save_data(times):
     start_time = times[4].strftime('%m/%d/%Y %H:%M:%S')
     end_time = times[5].strftime('%m/%d/%Y %H:%M:%S')
     with open('stats.csv', 'a') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow([start_time, end_time, times[2], times[3], times[4]])
+        csvwriter = csv.writer(csvfile,
+                                delimiter=',',
+                                quotechar='|',
+                                quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow([start_time, end_time, times[2], times[3], times[4]])
     
     flicker(0, 10, AMBER)
         
@@ -158,42 +182,51 @@ def get_session_type():
     else:
         return 'shit'
 
+
 if __name__ == '__main__':
     ass_switch = Button(26)
 
+    # Turn on power LED.
+    pixels[0] = RED
+
     while True:
-        
+
         while not connected_to_internet():
             print('WiFi signal lost.')
-            # Set Wi-Fi LED to orange.
+            blink(1, ORANGE)
             sleep(1)
         pixels[0] = GREEN
         pixels.show()
-        
+
         print('Waiting for ass.')
         ass_switch.wait_for_press()
         pixels[0] = AMBER
-        
+
         print('Ass found. Starting timer.')
         start = datetime.datetime.now()
-        
+
         print('Waiting for ass to disappear.')
         ass_switch.wait_for_release()
         pixels[0] = GREEN
-        
+
         print('Poof! Ass is gone. Ending timer.')
         end = datetime.datetime.now()
-        
+
         print('Calculating poop session length.')
         times = calculate_times(start, end)
-        
+
         print('Generating tweets with stats.')
         message = generate_session_message(times)
-        
+
         print('Sending tweet.')
         tweet(message)
-        
+
         print('Saving data to file.')
         save_data(times)
-    
-    sleep(0.1)
+
+    # Turn off power LED. We should never get here but...ya know...
+    while True:
+        pixels[0] = RED
+        sleep(1)
+        pixels[0] = CLEAR
+        sleep(1)
