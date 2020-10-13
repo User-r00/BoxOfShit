@@ -254,6 +254,7 @@ if __name__ == '__main__':
 
     # Turn on power LED.
     pixels[0] = RED
+    pixels[1] = RED
 
     while True:
 
