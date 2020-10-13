@@ -107,7 +107,7 @@ def generate_status_message(times):
 
     water = stats['water_usage']
     energy = stats['energy_cost']
-    status = f'{status} using {water}g of water and {energy} in energy.'
+    status = f'{status} using {water}g of water and ${energy} in energy.'
 
     return status
 
@@ -124,7 +124,7 @@ def calculate_stats(times):
     water_usage = 5
     energy_usage = calculate_kwh(hue_wattage, times[4])
     kwh_cost = 0.2437
-    energy_cost = kwh_cost * energy_usage
+    energy_cost = round(kwh_cost * energy_usage, 3)
 
     data = {
         'energy_usage': energy_usage,
