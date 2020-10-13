@@ -101,15 +101,38 @@ def generate_status_message(times):
     if minutes > 0:
         status = f'{status}{minutes} minutes'
 
-    status = f'{status}{seconds} seconds.'
+    status = f'{status}{seconds} seconds'
+
+    stats = calculate_stats(times)
+
+    water = stats['water_usage']
+    energy = stats['energy_cost']
+    status = f'{status} using {water}g of water and {energy} in energy.'
 
     return status
 
 
+def calculate_kwh(wattage, seconds):
+    '''Calculate kilowatt hours base on wattage.'''
+    hours = seconds / 60 / 60
+    return wattage * hours / 1000
+
+
 def calculate_stats(times):
     '''Calculate various stats based on session time.'''
-    energy_cost = 0
-    water_cost = 0
+    hue_wattage = 5.4
+    water_usage = 5
+    energy_usage = calculate_kwh(hue_wattage, times[4])
+    kwh_cost = 0.2437
+    energy_cost = kwh_cost * energy_usage
+
+    data = {
+        'energy_usage': energy_usage,
+        'energy_cost': energy_cost,
+        'water_usage': water_usage
+    }
+
+    return data
 
 
 def flicker(led: int, duration: int, color: set):
