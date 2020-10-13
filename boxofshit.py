@@ -141,7 +141,6 @@ def flicker(led: int, duration: int, color: set):
     random_ceiling = 25
 
     for i in range(duration):
-        print(i)
         # light up for that time
         pixels[led] = color
 
@@ -197,8 +196,7 @@ def tweet(message):
 
 
 def save_data(times):
-    # start_time = times[4].strftime('%m/%d/%Y %H:%M:%S')
-    # end_time = times[5].strftime('%m/%d/%Y %H:%M:%S')
+    '''Save session data to a file.'''
     with open('stats.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile,
                                delimiter=',',
