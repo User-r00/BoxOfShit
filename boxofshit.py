@@ -113,19 +113,33 @@ def generate_status_message(times):
 
 
 def calculate_kwh(wattage, seconds):
-    '''Calculate kilowatt hours base on wattage.'''
+    '''Calculate kilowatt hours based on wattage.'''
+    # Convert seconds into hours.
     hours = seconds / 60 / 60
+
+    # Calculate and return kWh.
     return wattage * hours / 1000
 
 
 def calculate_stats(times):
     '''Calculate various stats based on session time.'''
+    # Wattage of one Philips Hue bulb at full brightness.
     hue_wattage = 5.4
-    water_usage = 5
-    energy_usage = calculate_kwh(hue_wattage, times[4])
-    kwh_cost = 0.2437
-    energy_cost = round(kwh_cost * energy_usage, 3)
 
+    # Number of bulbs in the bathroom.
+    bulb_count = 1
+
+    # Gallons of water used per flush.
+    water_usage = 5
+
+    # kWh of energy used by the bulbs.
+    energy_usage = calculate_kwh(hue_wattage * bulb_count, times[4])
+    kwh_cost = 0.2437
+
+    # Energy usage in cents.
+    energy_cost = round(kwh_cost * energy_usage * 100, 3)
+
+    # Package the data.
     data = {
         'energy_usage': energy_usage,
         'energy_cost': energy_cost,
