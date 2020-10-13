@@ -78,22 +78,38 @@ CLEAR = (0, 0, 0)
 # Setup I2C
 i2c = busio.I2C(board.SCL, board.SDA)
 
-
 # Time of flight sensor. Used for measuring standing vs sitting posture.
 piss_shit_sensor = adafruit_vl53l0x.VL53L0X(i2c)
 piss_shit_sensor.measurement_timing_budget = 200000
 
 
-def generate_session_message(times):
-    minutes = times[2]
-    seconds = times[3]
+def generate_status_message(times):
+    hours = times[2]
+    minutes = times[3]
+    seconds = times[4]
 
     session_type = get_session_type()
 
     if session_type == 'shit':
-        return f'I pooped for {minutes} minutes and {seconds} seconds.'
+        status = 'I pooped for '
+    else:
+        status = 'I peed for '
 
-    return f'I peed for {minutes} minutes and {seconds} seconds.'
+    if hours > 0:
+        status = f'{status}{hours} hours'
+
+    if minutes > 0:
+        status = f'{status}{minutes} minutes'
+
+    status = f'{status}{seconds} seconds.'
+
+    return status
+
+
+def calculate_stats(times):
+    '''Calculate various stats based on session time.'''
+    energy_cost = 0
+    water_cost = 0
 
 
 def flicker(led: int, duration: int, color: set):
@@ -129,45 +145,53 @@ def blink(led, color):
 
 def calculate_times(start, end):
     time_delta = end - start
+    hours = time_delta.seconds // 3600
     minutes = (time_delta.seconds // 60) % 60
-    seconds = time_delta.seconds - (minutes * 60)
+    seconds = time_delta.seconds - (minutes * 60) - (hours * 3600)
 
     start_str = start.strftime('%m/%d/%Y %H:%M:%S')
     end_str = end.strftime('%m/%d/%Y %H:%M:%S')
 
-    return (start_str, end_str, minutes, seconds, start, end)
+    return (start_str, end_str, hours, minutes, seconds, start, end)
 
 
 def tweet(message):
     # Number of times to retry sending a tweet before giving up.
     retries = 3
     successful_tweet = False
-    
+
     for retry in range(retries - 1):
         if not successful_tweet:
             pixels[1] = BLUE
             status = api.PostUpdate(message)
-            
+
             if message not in status.text:
                 sleep(3)
             else:
                 successful_tweet = True
-        
+
     flicker(1, 10, (BLUE))
 
 
 def save_data(times):
-    start_time = times[4].strftime('%m/%d/%Y %H:%M:%S')
-    end_time = times[5].strftime('%m/%d/%Y %H:%M:%S')
+    # start_time = times[4].strftime('%m/%d/%Y %H:%M:%S')
+    # end_time = times[5].strftime('%m/%d/%Y %H:%M:%S')
     with open('stats.csv', 'a') as csvfile:
         csvwriter = csv.writer(csvfile,
-                                delimiter=',',
-                                quotechar='|',
-                                quoting=csv.QUOTE_MINIMAL)
-        csvwriter.writerow([start_time, end_time, times[2], times[3], times[4]])
-    
+                               delimiter=',',
+                               quotechar='|',
+                               quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow([times[0],
+                            times[1],
+                            times[2],
+                            times[3],
+                            times[4],
+                            times[5],
+                            times[6]])
+
     flicker(1, 10, AMBER)
-        
+
+
 def connected_to_internet():
     '''Checks if the system is connected to the internet.'''
     with requests.Session() as session:
@@ -176,13 +200,14 @@ def connected_to_internet():
             return True
         else:
             return False
-            
+
+
 def get_session_type():
     '''Determine type of bathroom session.'''
     poop_threshold = 200
-    
+
     distance_to_cheeks = piss_shit_sensor.range
-    print(f'Distance to cheeks at time of session end: {distance_to_cheeks}mm.')
+
     if distance_to_cheeks > poop_threshold:
         return 'piss'
     else:
@@ -220,7 +245,7 @@ if __name__ == '__main__':
         times = calculate_times(start, end)
 
         print('Generating tweets with stats.')
-        message = generate_session_message(times)
+        message = generate_status_message(times)
 
         print('Sending tweet.')
         tweet(message)
